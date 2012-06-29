@@ -3,9 +3,7 @@ from django.shortcuts import render_to_response, get_object_or_404
 from django.http import HttpResponseRedirect, Http404
 from django.template import RequestContext
 from django.contrib.auth.decorators import login_required
-
 from notification.models import *
-from notification.decorators import basic_auth_required, simple_basic_auth_callback
 
 
 @login_required
@@ -38,6 +36,7 @@ def notices(request):
         "notice_settings": notice_settings,
     }, context_instance=RequestContext(request))
 
+
 @login_required
 def single(request, id):
     notice = get_object_or_404(Notice, id=id)
@@ -46,6 +45,7 @@ def single(request, id):
             "notice": notice,
         }, context_instance=RequestContext(request))
     raise Http404
+
 
 @login_required
 def archive(request, noticeid=None, next_page=None):
@@ -61,6 +61,7 @@ def archive(request, noticeid=None, next_page=None):
             return HttpResponseRedirect(next_page)
     return HttpResponseRedirect(next_page)
 
+
 @login_required
 def delete(request, noticeid=None, next_page=None):
     if noticeid:
@@ -74,6 +75,7 @@ def delete(request, noticeid=None, next_page=None):
         except Notice.DoesNotExist:
             return HttpResponseRedirect(next_page)
     return HttpResponseRedirect(next_page)
+
 
 @login_required
 def mark_all_seen(request):
