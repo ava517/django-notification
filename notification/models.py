@@ -266,8 +266,13 @@ def send_now(users, label, extra_context=None, on_site=True, MailClass=None):
 
         if not user.email:
             return
+
+        if not user.is_active:
+            continue
+
         if not should_send(user, notice_type, "1"):
             continue
+
         recipients = [user.email]
 
         if MailClass is None:
