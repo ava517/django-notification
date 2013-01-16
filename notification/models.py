@@ -34,7 +34,7 @@ class LanguageStoreNotAvailable(Exception):
 class NoticeType(models.Model):
 
     label = models.CharField(_('label'), max_length=40)
-    display = models.CharField(_('display'), max_length=50)
+    display = models.CharField(_('display'), max_length=60)
     description = models.CharField(_('description'), max_length=100)
 
     # by default only on for media with sensitivity less than or equal to this number
@@ -236,7 +236,7 @@ def send_now(users, label, extra_context=None, on_site=True):
         'spam': 'eggs',
         'foo': 'bar',
     )
-    
+
     You can pass in on_site=False to prevent the notice emitted from being
     displayed on the site.
     """
@@ -334,7 +334,7 @@ def send(*args, **kwargs):
             return queue(*args, **kwargs)
         else:
             return send_now(*args, **kwargs)
-        
+
 def queue(users, label, extra_context=None, on_site=True):
     """
     Queue the notification in NoticeQueueBatch. This allows for large amounts
