@@ -1,14 +1,8 @@
 import datetime
 
-try:
-    import cPickle as pickle
-except ImportError:
-    import pickle
-
 from django.db import models
-from django.db.models.query import QuerySet
 from django.conf import settings
-from django.core.mail import send_mail, EmailMultiAlternatives
+from django.core.mail import EmailMultiAlternatives
 from django.core.urlresolvers import reverse
 from django.template import Context
 from django.template.loader import render_to_string
@@ -23,7 +17,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes import generic
 
 from django.utils.translation import ugettext_lazy as _
-from django.utils.translation import ugettext, get_language, activate
+from django.utils.translation import ugettext, get_language
 
 
 class LanguageStoreNotAvailable(Exception):
@@ -36,7 +30,8 @@ class NoticeType(models.Model):
     display = models.CharField(_('display'), max_length=60)
     description = models.CharField(_('description'), max_length=100)
 
-    # by default only on for media with sensitivity less than or equal to this number
+    # By default only on for media with sensitivity less than
+    # or equal to this number
     default = models.IntegerField(_('default'))
 
     def __unicode__(self):
@@ -54,8 +49,9 @@ NOTICE_MEDIA = (
 
 # how spam-sensitive is the medium
 NOTICE_MEDIA_DEFAULTS = {
-    "1": 2 # email
+    "1": 2                                                  # email
 }
+
 
 class NoticeSetting(models.Model):
     """
@@ -76,10 +72,14 @@ class NoticeSetting(models.Model):
 
 def get_notification_setting(user, notice_type, medium):
     try:
-        return NoticeSetting.objects.get(user=user, notice_type=notice_type, medium=medium)
+        return NoticeSetting.objects.get(
+            user=user, notice_type=notice_type, medium=medium
+        )
     except NoticeSetting.DoesNotExist:
         default = (NOTICE_MEDIA_DEFAULTS[medium] <= notice_type.default)
-        setting = NoticeSetting(user=user, notice_type=notice_type, medium=medium, send=default)
+        setting = NoticeSetting(
+            user=user, notice_type=notice_type, medium=medium, send=default
+        )
         setting.save()
         return setting
 
@@ -212,7 +212,7 @@ def get_template_name(label, f):
     return 'notification/%s/%s' % (label, f)
 
 
-def send_now(users, label, extra_context=None, on_site=True, MailClass=None):
+def send(users, label, extra_context=None, on_site=True, MailClass=None):
     """
     Creates a new notice.
 
@@ -301,10 +301,6 @@ def send_now(users, label, extra_context=None, on_site=True, MailClass=None):
         subject = ''.join(messages['notice.html'].splitlines())
         mailer = MailClass(recipients, context, body=body, subject=subject)
         mailer.send(fail_silently=False)
-
-
-def send(*args, **kwargs):
-    return send_now(*args, **kwargs)
 
 
 class ObservedItemManager(models.Manager):
