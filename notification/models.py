@@ -29,6 +29,7 @@ class NoticeType(models.Model):
     label = models.CharField(_('label'), max_length=40)
     display = models.CharField(_('display'), max_length=60)
     description = models.CharField(_('description'), max_length=100)
+    is_visible = models.BooleanField(default=False)
 
     # By default only on for media with sensitivity less than
     # or equal to this number
@@ -161,7 +162,8 @@ class Notice(models.Model):
     get_absolute_url = models.permalink(get_absolute_url)
 
 
-def create_notice_type(label, display, description, default=2, verbosity=1):
+def create_notice_type(label, display, description, is_visible,
+                       default=2, verbosity=1):
     """
     Creates a new NoticeType.
 
@@ -179,12 +181,18 @@ def create_notice_type(label, display, description, default=2, verbosity=1):
         if default != notice_type.default:
             notice_type.default = default
             updated = True
+        if is_visible != notice_type.is_visible:
+            notice_type.is_visible = is_visible
+            updated = True
         if updated:
             notice_type.save()
             if verbosity > 1:
                 print "Updated %s NoticeType" % label
     except NoticeType.DoesNotExist:
-        NoticeType(label=label, display=display, description=description, default=default).save()
+        NoticeType(
+            label=label, display=display, description=description,
+            default=default, is_visible=is_visible
+        ).save()
         if verbosity > 1:
             print "Created %s NoticeType" % label
 
